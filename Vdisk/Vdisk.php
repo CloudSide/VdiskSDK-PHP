@@ -257,6 +257,7 @@ class OAuth2 {
 		
 		if ($method == 'GET' && $this->outFile) { // GET
 		
+			$options[CURLOPT_HTTPHEADER] = array();
 			$options[CURLOPT_RETURNTRANSFER] = false;
 			$options[CURLOPT_HEADER] = false;
 			$options[CURLOPT_FILE] = $this->outFile;
@@ -1006,26 +1007,30 @@ class Client {
      * <br />对应API: {@link http://vdisk.weibo.com/developers/index.php?module=api&action=apidoc#files_post files(POST)}	 
      *
      * exceeds this limit or does not exist, an Exception will be thrown
-     * @param string $file Absolute path to the file to be uploaded
-     * @param string|bool $filename The destination filename of the uploaded file
-     * @param string $path Path to upload the file to, relative to root
+     * @param string $file 要上传的文件的真实路径
+     * @param string $toPath 目标文件路径
      * @param boolean $overwrite Should the file be overwritten? (Default: true)
+	 * @param string $parentRev 当前文件的版本
      * @return object stdClass
      */
-    public function putFile($file, $filename = false, $path = '', $overwrite = true) {
+    public function putFile($file, $toPath, $overwrite = true, $parentRev = null) {
     
         if (file_exists($file)) {
         
-            $call = 'files/' . $this->root . '/' . $this->encodePath($path);
+            $call = 'files/' . $this->root . '/' . $this->encodePath($toPath);
             // If no filename is provided we'll use the original filename
-            $filename = (is_string($filename)) ? $filename : basename($file);
+            $filename = basename($file);
             
             $params = array(
-            
-                'filename' => $filename,
+
                 'file' => '@' . str_replace('\\', '/', $file) . ';filename=' . $filename,
-                'overwrite' => (int) $overwrite,
+                'overwrite' => $overwrite ? 'true' : 'false',
             );
+
+			if ($parentRev && is_string($parentRev)) {
+				
+				$params['parent_rev'] = $parentRev;
+			}
             
             $response = $this->fetch('POST', self::CONTENT_URL, $call, $params);
             
@@ -1044,15 +1049,15 @@ class Client {
      *
      * @todo Add filesize check
      * @param resource $stream A readable stream created using fopen()
-     * @param string $filename The destination filename, including path
+     * @param string $toPath The destination filename, including path
      * @param boolean $overwrite Should the file be overwritten? (Default: true)
      * @return array
      */
-    public function putStream($stream, $filename, $overwrite = true) {
+    public function putStream($stream, $toPath, $overwrite = true) {
     
         $this->OAuth->setInFile($stream);
-        $path = $this->encodePath($filename);
-        $params = array('overwrite' => (int) $overwrite);
+        $path = $this->encodePath($toPath);
+        $params = array('overwrite' => $overwrite ? 'true' : 'false');
         $call = 'files_put/' . $this->root . '/' . $path . '?' . http_build_query($params);
         $response = $this->fetch('PUT', self::CONTENT_URL, $call);
         
@@ -1078,7 +1083,12 @@ class Client {
             throw new Exception('This method only supports the `php` response format');
         }
         
-        $handle = null;
+        $file = $this->encodePath($file);
+        $params = array('rev' => $revision);
+        $call = 'files/' . $this->root . '/' . $file . '?' . http_build_query($params);
+        $response = $this->fetch('GET', self::API_URL, $call);
+
+		$handle = null;
         
         if ($outFile !== false) {
         
@@ -1090,13 +1100,13 @@ class Client {
             } else {
         
                 $this->OAuth->setOutFile($handle);
+
+				if (isset($response['headers']['location'])) {
+					
+					$this->fetch('GET', $response['headers']['location']);
+				}
             }
         }
-        
-        $file = $this->encodePath($file);
-        $params = array('rev' => $revision);
-        $call = 'files/' . $this->root . '/' . $file . '?' . http_build_query($params);
-        $response = $this->fetch('GET', self::CONTENT_URL, $call);
         
         // Close the file handle if one was opened
         if ($handle) fclose($handle);
@@ -1106,7 +1116,8 @@ class Client {
             'name' => ($outFile) ? $outFile : basename($file),
             'mime' => $this->getMimeType(($outFile) ?: $response['body'], $outFile),
             'meta' => json_decode($response['headers']['x-vdisk-metadata']),
-            'data' => $response['body'],
+            //'data' => $response['body'],
+			'download_url' => $response['headers']['location'],
         );
     }
     
@@ -1123,7 +1134,7 @@ class Client {
      * @param array $params Additional parameters
      * @return mixed
      */
-    private function fetch($method, $url, $call, array $params = array(), array $headers = array()) {
+    private function fetch($method, $url, $call = '', array $params = array(), array $headers = array()) {
 		
 		$url .= $call;
 		
