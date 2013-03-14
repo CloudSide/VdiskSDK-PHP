@@ -353,7 +353,8 @@ class OAuth2 {
 						throw new BadRequestException($message, 400);
 						break;
 					case 401:
-						throw new UnauthorizedException($message, 401);						break;
+						throw new UnauthorizedException($message, 401);
+						break;
 					case 404:
 						throw new NotFoundException($message, 404);
 						break;
