@@ -51,6 +51,12 @@ if (isset($_SESSION['token']) &&
 <body>
 
 <div><h2>VdiskSDK-PHP</h2></div>
+
+<div>
+SDK For PHP文档地址: <a href="https://github.com/CloudSide/VdiskSDK-PHP">https://github.com/CloudSide/VdiskSDK-PHP</a>
+</div>
+<br>
+
 <div>
 SDK For PHP文档地址: <a href="http://vauth.appsina.com/Doc/namespaces/Vdisk.html">http://vauth.appsina.com/Doc/namespaces/Vdisk.html</a>
 </div>
