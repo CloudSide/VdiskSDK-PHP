@@ -856,7 +856,7 @@ class Client {
 			'include_deleted' => (int) $deleted,
 		);
 	
-        $call = 'search/' . $this->root . '/' . $this->encodePath($path) . '?' . http_build_query($params);;
+        $call = 'search/' . $this->root . '/' . $this->encodePath($path) . '?' . http_build_query($params);
 
         $response = $this->fetch('GET', self::API_URL, $call);
 
@@ -978,7 +978,8 @@ class Client {
     /**
      * Moves a file or folder to a new location
 	 *
-	 * <br />对应API: {@link http://vdisk.weibo.com/developers/index.php?module=api&action=apidoc#move fileops/move}	 *
+	 * <br />对应API: {@link http://vdisk.weibo.com/developers/index.php?module=api&action=apidoc#move fileops/move}	 
+	 *
      * @param string $from File or folder to be moved, relative to root
      * @param string $to Destination path, relative to root
      * @return object stdClass
@@ -999,7 +1000,116 @@ class Client {
     }
 
 
-	
+	/**
+     * Uploads a physical file from disk
+     * 
+     * <br />对应API: {@link http://vdisk.weibo.com/developers/index.php?module=api&action=apidoc#files_post files(POST)}	 
+     *
+     * exceeds this limit or does not exist, an Exception will be thrown
+     * @param string $file Absolute path to the file to be uploaded
+     * @param string|bool $filename The destination filename of the uploaded file
+     * @param string $path Path to upload the file to, relative to root
+     * @param boolean $overwrite Should the file be overwritten? (Default: true)
+     * @return object stdClass
+     */
+    public function putFile($file, $filename = false, $path = '', $overwrite = true) {
+    
+        if (file_exists($file)) {
+        
+            $call = 'files/' . $this->root . '/' . $this->encodePath($path);
+            // If no filename is provided we'll use the original filename
+            $filename = (is_string($filename)) ? $filename : basename($file);
+            
+            $params = array(
+            
+                'filename' => $filename,
+                'file' => '@' . str_replace('\\', '/', $file) . ';filename=' . $filename,
+                'overwrite' => (int) $overwrite,
+            );
+            
+            $response = $this->fetch('POST', self::CONTENT_URL, $call, $params);
+            
+            return $response;
+        }
+        
+        // Throw an Exception if the file does not exist
+        throw new Exception('Local file ' . $file . ' does not exist');
+    }
+    
+    /**
+     * Uploads file data from a stream
+     * Note: This function is experimental and requires further testing
+     *
+     * <br />对应API: {@link http://vdisk.weibo.com/developers/index.php?module=api&action=apidoc#files_put files_put}
+     *
+     * @todo Add filesize check
+     * @param resource $stream A readable stream created using fopen()
+     * @param string $filename The destination filename, including path
+     * @param boolean $overwrite Should the file be overwritten? (Default: true)
+     * @return array
+     */
+    public function putStream($stream, $filename, $overwrite = true) {
+    
+        $this->OAuth->setInFile($stream);
+        $path = $this->encodePath($filename);
+        $params = array('overwrite' => (int) $overwrite);
+        $call = 'files_put/' . $this->root . '/' . $path . '?' . http_build_query($params);
+        $response = $this->fetch('PUT', self::CONTENT_URL, $call);
+        
+        return $response;
+    }
+    
+    /**
+     * Downloads a file
+     * Returns the base filename, raw file data and mime type returned by Fileinfo
+     *
+     * <br />对应API: {@link http://vdisk.weibo.com/developers/index.php?module=api&action=apidoc#files_get files(GET)}
+     *
+     * @param string $file Path to file, relative to root, including path
+     * @param string $outFile Filename to write the downloaded file to
+     * @param string $revision The revision of the file to retrieve
+     * @return array
+     */
+    public function getFile($file, $outFile = false, $revision = null) {
+    
+        // Only allow php response format for this call
+        if ($this->responseFormat !== 'php') {
+        
+            throw new Exception('This method only supports the `php` response format');
+        }
+        
+        $handle = null;
+        
+        if ($outFile !== false) {
+        
+            // Create a file handle if $outFile is specified
+            if (!$handle = fopen($outFile, 'w')) {
+        
+                throw new Exception("Unable to open file handle for $outFile");
+        
+            } else {
+        
+                $this->OAuth->setOutFile($handle);
+            }
+        }
+        
+        $file = $this->encodePath($file);
+        $params = array('rev' => $revision);
+        $call = 'files/' . $this->root . '/' . $file . '?' . http_build_query($params);
+        $response = $this->fetch('GET', self::CONTENT_URL, $call);
+        
+        // Close the file handle if one was opened
+        if ($handle) fclose($handle);
+
+        return array(
+        
+            'name' => ($outFile) ? $outFile : basename($file),
+            'mime' => $this->getMimeType(($outFile) ?: $response['body'], $outFile),
+            'meta' => json_decode($response['headers']['x-vdisk-metadata']),
+            'data' => $response['body'],
+        );
+    }
+    
 	
 
 	/* ================================================================= */
