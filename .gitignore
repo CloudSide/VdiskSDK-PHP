@@ -44,4 +44,4 @@ leveldb/include/.DS_Store
 *.svg
 
 Doc*
-*/t.php
+*Vdisk/t.php
