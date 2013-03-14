@@ -125,3 +125,80 @@ try {
 
 ```
 
+- 下载文件
+
+```php
+
+$client = new \Vdisk\Client($oauth2, 'basic');
+
+$client->setDebug(true); //开启调试模式
+
+try {
+
+    $response = $client->getFile('云端文件的全路径', '下载到本地目标文件的全路径');
+   
+    // Dump the output
+    echo "<pre>";
+    print_r($response);
+    echo "</pre>";
+
+} catch (\Vdisk\Exception $e) { //捕获异常
+
+    echo "<pre>";
+    echo get_class($e) . ' ' . '#' . $e->getCode() . ': ' . $e->getMessage();
+    echo "</pre>";
+}
+
+```
+
+- 上传文件(POST)
+
+```php
+
+$client = new \Vdisk\Client($oauth2, 'basic');
+
+$client->setDebug(true); //开启调试模式
+
+try {
+
+    $response = $client->putFile('本地文件真实路径', '要上传的目标全路径');
+   
+    // Dump the output
+    echo "<pre>";
+    print_r($response);
+    echo "</pre>";
+
+} catch (\Vdisk\Exception $e) { //捕获异常
+
+    echo "<pre>";
+    echo get_class($e) . ' ' . '#' . $e->getCode() . ': ' . $e->getMessage();
+    echo "</pre>";
+}
+
+```
+
+- 上传文件(PUT)
+
+```php
+$client = new \Vdisk\Client($oauth2, 'basic');
+
+$client->setDebug(true); //开启调试模式
+
+try {
+
+    $response = $client->putStream(fopen('本地文件真实路径', 'r'), '云端目标文件全路径')
+   
+    // Dump the output
+    echo "<pre>";
+    print_r($response);
+    echo "</pre>";
+
+} catch (\Vdisk\Exception $e) { //捕获异常
+
+    echo "<pre>";
+    echo get_class($e) . ' ' . '#' . $e->getCode() . ': ' . $e->getMessage();
+    echo "</pre>";
+}
+
+```
+
