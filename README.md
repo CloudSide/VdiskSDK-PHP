@@ -22,6 +22,7 @@ SDK For PHP文档地址: http://vauth.appsina.com/Doc/namespaces/Vdisk.html
 Usage
 =====
 
+- 用户授权
 
 ```php
 
@@ -31,5 +32,31 @@ $auth_url = $oauth2->getAuthorizeURL('您在开发者中心设置的跳转地址
 /*
 引导用户访问授权页面: $auth_url
 */
+
+```
+
+- 获得access token
+
+```php
+
+if (isset($_REQUEST['code'])) {
+  
+	$keys = array();
+	$keys['code'] = $_REQUEST['code'];
+	$keys['redirect_uri'] = '您在开发者中心设置的跳转地址';
+	
+	try {
+		
+		$token = $oauth2->getAccessToken('code', $keys);
+		print_r(token); //得到access token
+		
+	} catch (Exception $e) {
+		
+		echo "<pre>";
+		print_r($e->getMessage());
+		echo "</pre>";
+		echo "<a href='index.php'>返回</a>";
+	}
+}
 
 ```
