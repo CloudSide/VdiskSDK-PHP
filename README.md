@@ -39,6 +39,8 @@ $auth_url = $oauth2->getAuthorizeURL('您在开发者中心设置的跳转地址
 
 ```php
 
+//用户授权成功后, 会跳转到你的callback地址, 您需要用code参数换取access token
+
 if (isset($_REQUEST['code'])) {
   
 	$keys = array();
@@ -60,3 +62,61 @@ if (isset($_REQUEST['code'])) {
 }
 
 ```
+
+- 获得用户信息
+
+```php
+
+$client = new \Vdisk\Client($oauth2);
+$client->setDebug(true); //开启调试模式
+		
+try {
+			
+	// Attempt to retrieve the account information
+	$response = $client->accountInfo(); //调用accountInfo方法
+	$accountInfo = $response['body'];
+	// Dump the output
+	echo "<pre>";
+	print_r($accountInfo); //打印用户信息
+	echo "</pre>";
+
+} catch (\Vdisk\Exception $e) { //捕获异常
+			
+	echo "<pre>";
+	echo get_class($e) . ' ' . '#' . $e->getCode() . ': ' . $e->getMessage();
+	echo "</pre>";
+}
+
+```
+
+- 获得文件列表、目录/文件信息
+
+```php
+
+$client = new \Vdisk\Client($oauth2, 'basic');
+//$client->setDebug(true);  //开启调试模式
+
+try {
+	
+	if (isset($_GET['path'])) {
+		
+		$path = $_GET['path'];
+	
+	} else {
+		
+		$path = '/';	
+	}
+	
+	// Attempt to retrieve the account information
+	$response = $client->metaData($path); //调用metaData方法
+	$metaData = $response['body'];
+
+} catch (\Vdisk\Exception $e) { //捕获异常
+	
+	echo "<pre>";
+	echo get_class($e) . ' ' . '#' . $e->getCode() . ': ' . $e->getMessage();
+	echo "</pre>";
+}
+
+```
+
