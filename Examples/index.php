@@ -50,6 +50,19 @@ if (isset($_SESSION['token']) &&
 </head>
 <body>
 
+<div><h2>VdiskSDK-PHP</h2></div>
+<div>
+SDK For PHP文档地址: <a href="http://vauth.appsina.com/Doc/namespaces/Vdisk.html">http://vauth.appsina.com/Doc/namespaces/Vdisk.html</a>
+</div>
+<br>
+<div>
+RESTful API文档:<a href="http://vdisk.weibo.com/developers/index.php?module=api&action=apidoc">http://vdisk.weibo.com/developers/index.php?module=api&action=apidoc</a>
+</div>
+<br>
+<div>关于微盘OPENAPI、SDK使用以及技术问题请联系: <a href="http://weibo.com/smcz">@一个开发者</a></div>
+
+<br><br>
+
 <?php if ($is_login) { ?>
 
 <div><a href="index.php?logout=1&<?=time();?>">退出登录</a></div>
