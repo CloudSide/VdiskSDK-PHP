@@ -18,9 +18,14 @@ SDK For PHP文档地址: http://vauth.appsina.com/Doc/namespaces/Vdisk.html
 
 [![](http://service.t.sina.com.cn/widget/qmd/1656360925/02781ba4/4.png)](http://weibo.com/smcz)
 
------
-Usage
-=====
+
+### Requirements
+
+* PHP >= 5.3.1
+* [PHP cURL]
+
+### Usage
+
 
 - 用户授权
 
