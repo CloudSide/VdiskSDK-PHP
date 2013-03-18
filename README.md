@@ -186,7 +186,7 @@ $client->setDebug(true); //开启调试模式
 
 try {
 
-    $response = $client->putStream(fopen('本地文件真实路径', 'r'), '云端目标文件全路径')
+    $response = $client->putStream(fopen('本地文件真实路径', 'r'), '云端目标文件全路径');
    
     // Dump the output
     echo "<pre>";
