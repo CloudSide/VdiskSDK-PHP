@@ -1011,9 +1011,10 @@ class Client {
      * @param string $toPath 目标文件路径
      * @param boolean $overwrite Should the file be overwritten? (Default: true)
 	 * @param string $parentRev 当前文件的版本
+	 * @param boolean $safe 是否使用https 默认为false
      * @return object stdClass
      */
-    public function putFile($file, $toPath, $overwrite = true, $parentRev = null) {
+    public function putFile($file, $toPath, $overwrite = true, $parentRev = null, $safe = false) {
     
         if (file_exists($file)) {
         
@@ -1032,9 +1033,16 @@ class Client {
 				$params['parent_rev'] = $parentRev;
 			}
             
-            $response = $this->fetch('POST', self::CONTENT_URL, $call, $params);
-            
-            return $response;
+			if ($safe) {
+				
+				$response = $this->fetch('POST', self::CONTENT_SAFE_URL, $call, $params);
+				
+			} else {
+				
+				$response = $this->fetch('POST', self::CONTENT_URL, $call, $params);
+			}
+			
+			return $response;
         }
         
         // Throw an Exception if the file does not exist
@@ -1051,16 +1059,25 @@ class Client {
      * @param resource $stream A readable stream created using fopen()
      * @param string $toPath The destination filename, including path
      * @param boolean $overwrite Should the file be overwritten? (Default: true)
+	 * @param boolean $safe 是否使用https 默认为false
      * @return array
      */
-    public function putStream($stream, $toPath, $overwrite = true) {
+    public function putStream($stream, $toPath, $overwrite = true, $safe = false) {
     
         $this->OAuth->setInFile($stream);
         $path = $this->encodePath($toPath);
         $params = array('overwrite' => $overwrite ? 'true' : 'false');
         $call = 'files_put/' . $this->root . '/' . $path . '?' . http_build_query($params);
-        $response = $this->fetch('PUT', self::CONTENT_URL, $call);
-        
+
+		if ($safe) {
+			
+			$response = $this->fetch('PUT', self::CONTENT_SAFE_URL, $call);
+		
+		} else {
+			
+			$response = $this->fetch('PUT', self::CONTENT_URL, $call);
+		}
+		
         return $response;
     }
     
