@@ -612,11 +612,11 @@ class Client {
 	/**
 	 * @ignore
 	 */
-	const API_URL     		= 'https://openapi.vdisk.me/2/';
+	const API_URL     		= 'https://api.weipan.cn/2/';
 	/**
 	 * @ignore
 	 */	
-	const CONTENT_URL 		= 'http://upload.openapi.vdisk.me/2/';
+	const CONTENT_URL 		= 'http://upload-vdisk.sina.com.cn/2/';
 	/**
 	 * @ignore
 	 */
