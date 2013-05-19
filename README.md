@@ -14,16 +14,13 @@ Demo演示地址: http://vauth.appsina.com/
 SDK For PHP文档地址: http://vauth.appsina.com/Doc/namespaces/Vdisk.html
 
 
-关于微盘OPENAPI、SDK使用以及技术问题请联系: [@一个开发者](http://weibo.com/smcz) [@tthf](http://weibo.com/u/1401437867)
+关于微盘OPENAPI、SDK使用以及技术问题请联系: [@一个开发者](http://weibo.com/smcz)
 
 QQ群: 134719337、162285095
 
 邮箱: [cloudside@sina.cn](mailto:cloudside@sina.cn)
 
 [![](http://service.t.sina.com.cn/widget/qmd/1656360925/02781ba4/4.png)](http://weibo.com/smcz)
-
-[![](http://service.t.sina.com.cn/widget/qmd/1401437867/02781ba4/4.png)](http://weibo.com/u/1401437867)
-
 
 
 ### Requirements
