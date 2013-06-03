@@ -865,6 +865,32 @@ class Client {
     }
     
     /**
+     * 获取图片文件的缩略图
+	 *
+     * <br />对应API: {@link http://vdisk.weibo.com/developers/index.php?module=api&action=apidoc#thumbnails thumbnails}
+	 *
+     * @param string $path The path to the file/folder you want a sharable link to
+     * @param string $size 缩略图的尺寸 字符串(s,m,l,xl)
+     * @param string &$url 缩略图下载地址
+     *
+     * @return object stdClass
+     */
+    public function thumbnails($path, $size, &$url) {
+	
+        $call = 'thumbnails/' . $this->root . '/' .$this->encodePath($path);
+        $response = $this->fetch('GET', self::API_URL, $call);
+        
+        
+        if (isset($response['headers']['location'])) {
+					
+			$url = $response['headers']['location'];
+		}
+		       
+        return $response;
+    }
+    
+    
+    /**
      * Creates and returns a shareable link to files or folders
 	 *
      * <br />对应API: {@link http://vdisk.weibo.com/developers/index.php?module=api&action=apidoc#shares shares}
@@ -878,6 +904,8 @@ class Client {
         $response = $this->fetch('POST', self::API_URL, $call);
         return $response;
     }
+    
+    
     
     /**
      * Returns a link directly to a file
