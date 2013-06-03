@@ -871,7 +871,7 @@ class Client {
 	 *
      * @param string $path The path to the file/folder you want a sharable link to
      * @param string $size 缩略图的尺寸 字符串(s,m,l,xl)
-     * @param string &$url 缩略图下载地址
+     * @param string &$url 缩略图下载地址的引用
      *
      * @return object stdClass
      */
