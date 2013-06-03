@@ -418,7 +418,7 @@ class OAuth2 {
         
         // If the response body is not a JSON encoded string
         // we'll return the entire response body
-        if (!$body = json_decode($response)) {
+        if (($body = json_decode($response)) == null) {
 	
             $body = $response;
         }
