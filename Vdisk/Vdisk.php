@@ -791,7 +791,7 @@ class Client {
     public function delta($cursor = null) {
 	
         $params = array('cursor' => $cursor);
-		$call = 'delta?' . http_build_query($params);;
+		$call = 'delta/' . $this->root . '/?' . http_build_query($params);
         $response = $this->fetch('GET', self::API_URL, $call);
 
         return $response;
