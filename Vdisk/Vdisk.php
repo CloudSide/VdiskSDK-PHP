@@ -877,7 +877,9 @@ class Client {
      */
     public function thumbnails($path, $size, &$url) {
 	
-        $call = 'thumbnails/' . $this->root . '/' .$this->encodePath($path);
+	
+		$params = array('size' => $size);
+        $call = 'thumbnails/' . $this->root . '/' .$this->encodePath($path) . '?' . http_build_query($params);;
         $response = $this->fetch('GET', self::API_URL, $call);
         
         
