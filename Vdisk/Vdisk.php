@@ -882,7 +882,6 @@ class Client {
         $call = 'thumbnails/' . $this->root . '/' .$this->encodePath($path) . '?' . http_build_query($params);
         $response = $this->fetch('GET', self::API_URL, $call);
         
-        
         if (isset($response['headers']['location'])) {
 					
 			$url = $response['headers']['location'];
