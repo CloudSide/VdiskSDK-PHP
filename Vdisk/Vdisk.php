@@ -612,15 +612,19 @@ class Client {
 	/**
 	 * @ignore
 	 */
-	const API_URL     		= 'https://api.weipan.cn/2/';
-	/**
-	 * @ignore
-	 */	
-	const CONTENT_URL 		= 'http://upload-vdisk.sina.com.cn/2/';
+	const API_URL     				= 'https://api.weipan.cn/2/';
 	/**
 	 * @ignore
 	 */
-	const CONTENT_SAFE_URL	= 'https://upload-vdisk.sina.com.cn:4443/2/';
+	const WEIBO_API_URL     		= 'https://api.weipan.cn/weibo/';
+	/**
+	 * @ignore
+	 */	
+	const CONTENT_URL 				= 'http://upload-vdisk.sina.com.cn/2/';
+	/**
+	 * @ignore
+	 */
+	const CONTENT_SAFE_URL			= 'https://upload-vdisk.sina.com.cn:4443/2/';
 	
 	/**
 	 * @ignore
