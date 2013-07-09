@@ -968,6 +968,7 @@ class Client {
         if ($fromCopyRef) {
 	
             $params['from_path'] = null;
+			unset($params['from_path']);
             $params['from_copy_ref'] = $fromCopyRef;
         }
         
