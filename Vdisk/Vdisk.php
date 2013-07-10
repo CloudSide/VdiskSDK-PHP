@@ -624,7 +624,8 @@ class Client {
 	/**
 	 * @ignore
 	 */
-	const CONTENT_SAFE_URL			= 'https://upload-vdisk.sina.com.cn:4443/2/';
+	const CONTENT_SAFE_URL			= 'https://upload-vdisk.sina.com.cn/2/';
+	//const CONTENT_SAFE_URL			= 'https://upload-vdisk.sina.com.cn:4443/2/';
 	
 	/**
 	 * @ignore
