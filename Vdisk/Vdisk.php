@@ -859,7 +859,7 @@ class Client {
 		
 			'query' => $query,
 			'file_limit' => ($limit < 1) ? 1 : (($limit > 1000) ? 1000 : (int) $limit),
-			'include_deleted' => (int) $deleted,
+			'include_deleted' => $deleted ? 'true' : 'false',
 		);
 	
         $call = 'search/' . $this->root . '/' . $this->encodePath($path) . '?' . http_build_query($params);
