@@ -98,6 +98,15 @@ class ForbiddenException extends Exception {
 class OAuth2 {
 	
 	/**
+	 * internal
+	 */
+	public $internal = false;
+	
+	/**
+	 * sinauid
+	 */
+	public $sinauid = 0;	
+	/**
 	 * App Key
 	 */
 	public $clientId;
@@ -199,15 +208,9 @@ class OAuth2 {
 	
 	/**
 	 * @ignore
-	 * @todo 实现签名
 	 */
-	private function getSignedRequest($method, $url, array $headers = array(), array $postfields = array()) {
+	private function getSignedRequest($method, $url, array $headers = array(), array $postfields = array(), $internal = false, $sina_uid = 0) {
 
-		if (isset($this->accessToken) && $this->accessToken) {
-			
-			$headers[] = "Authorization: OAuth2 " . $this->accessToken;
-		}
-		
 		if (!empty($this->remoteIp)) {
 			
 			$headers[] = "x-vdisk-cip: " . $this->remoteIp;
@@ -217,7 +220,84 @@ class OAuth2 {
 			$headers[] = "x-vdisk-cip: " . $_SERVER['REMOTE_ADDR'];
 		}
 		
-		// @todo 签名后生成新的url
+		if ($internal) {
+			
+			$headers[] = "x-vdisk-cuid: " . $sina_uid;
+			
+			$headers_to_sign = array();
+			
+			foreach ($headers as $value) {
+				
+				if (strpos(strtolower($value), 'x-vdisk-') !== false) {
+					
+					$tmp_header = explode(':', $value);
+					$headers_to_sign[strtolower(trim($tmp_header[0]))] = trim($tmp_header[1]);
+				}
+			}
+			
+			ksort($headers_to_sign);
+			$headers_str_to_sign = array();
+			
+			foreach ($headers_to_sign as $key => $value) {
+				
+				$headers_str_to_sign[] = $key.':'.$value;
+			}
+			
+			$header_string = implode("\n", $headers_str_to_sign);
+			$expire = time() + 100;
+			
+			$querys = array();
+			
+			if (parse_url($url, PHP_URL_QUERY)) {
+				
+				$querys = explode('&', parse_url($url, PHP_URL_QUERY));
+			}
+			
+			foreach ($querys as $k => $v) {
+				
+				if (strpos($v, 'app_key') === 0 || strpos($v, 'expires') === 0 || strpos($v, 'ssig') === 0) {
+									
+					unset($querys[$k]);
+				}
+			}
+			
+			$query_string = '';
+			
+			if (count($querys) > 0) {
+				
+				$query_string = '?' . implode('&', $querys);
+				
+			}
+			
+			$dest_uri = parse_url($url, PHP_URL_PATH) . $query_string;
+			$string_to_sign = "{$method}\n\n$expire\n{$header_string}\n{$dest_uri}";
+			$ssig = urlencode(substr(base64_encode(hash_hmac("sha1", $string_to_sign, $this->clientSecret, true)), 5, 10));
+			
+			$querys_add[] = 'app_key=' . $this->clientId;
+			$querys_add[] = 'expire=' . $expire;
+			$querys_add[] = 'ssig=' . $ssig;
+			
+			$query_prefix = '?';
+			
+			if (parse_url($url, PHP_URL_QUERY)) {
+				
+				$query_prefix = '&';
+			}
+			
+			if (!parse_url($url, PHP_URL_QUERY) && substr($url, -1, 1) == '?') {
+							
+				$query_prefix = '';
+			}
+			
+			$url .= $query_prefix . implode('&', $querys_add);
+			
+		} else {
+			
+			if (isset($this->accessToken) && $this->accessToken) {
+						
+				$headers[] = "Authorization: OAuth2 " . $this->accessToken;
+			}
+		}
 		
 		return array (
 			
@@ -227,8 +307,10 @@ class OAuth2 {
 			'headers' => $headers,
 		);
 	}
-	
-	
+
+
+
+
 	/**
 	 * @ignore
 	 * Execute an API call
@@ -242,7 +324,8 @@ class OAuth2 {
 	public function fetch($method, $url, array $headers = array(), array $postfields = array()) {
 		
 		// Get the signed request URL
-		$request = $this->getSignedRequest($method, $url, $headers, $postfields);
+		//$request = $this->getSignedRequest($method, $url, $headers, $postfields);
+		$request = $this->getSignedRequest($method, $url, $headers, $postfields, $this->internal, $this->sinauid);
 		
 		// Initialise and execute a cURL request
 		$handle = curl_init($request['url']);
